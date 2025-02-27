@@ -3,64 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Image to GitHub1</title>
+    <title>Upload Image to GitHub</title>
 </head>
 <body>
-    <h2>Upload Image to GitHub Repository</h2>
-    <input type="file" id="fileInput" />
-    <button onclick="uploadImage()">Upload</button>
+    <h1>Upload Image to GitHub</h1>
+    <form id="uploadForm">
+        <input type="file" id="imageInput" accept="image/*" required>
+        <button type="submit">Upload</button>
+    </form>
     <p id="status"></p>
 
     <script>
-        const GITHUB_USERNAME = "radheeshm";
-        const REPO_NAME = "stockimages";
-        const BRANCH = "main"; // or "master" if default
-        const ACCESS_TOKEN = "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";
-        
-        async function uploadImage() {
-            const fileInput = document.getElementById("fileInput");
-            if (!fileInput.files.length) {
-                alert("Please select a file first!");
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const file = document.getElementById('imageInput').files[0];
+            if (!file) {
+                alert('Please select an image to upload.');
                 return;
             }
-        
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = async function () {
-                const content = reader.result.split(",")[1]; // Extract base64 content
-                const path = `uploads/${file.name}`; // File path in repo
-                const url = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/${path}`;
-        
-                // Use Basic Authentication (Alternative Method)
-                const headers = {
-                    "Authorization": `Basic ${btoa(GITHUB_USERNAME + ":" + ACCESS_TOKEN)}`,
-                    "Content-Type": "application/json"
-                };
-        
-                const response = await fetch(url, {
-                    method: "PUT",
-                    headers: headers,
-                    body: JSON.stringify({
-                        message: `Upload ${file.name}`,
-                        content: content,
-                        branch: BRANCH
-                    })
-                });
-        
-                const result = await response.json();
-                console.log("GitHub Response:", result); // Debugging
-        
-                if (response.ok) {
-                    document.getElementById("status").innerText = "✅ Image uploaded successfully!";
-                } else {
-                    document.getElementById("status").innerText = `❌ Upload failed: ${result.message}`;
-                }
-            };
-            
-            reader.readAsDataURL(file);
+
+            const status = document.getElementById('status');
+            status.textContent = 'Uploading...';
+
+            try {
+                const response = await uploadImageToGitHub(file);
+                status.textContent = 'Upload successful!';
+                console.log('Image uploaded:', response);
+            } catch (error) {
+                status.textContent = 'Upload failed.';
+                console.error('Error uploading image:', error);
+            }
+        });
+
+        async function uploadImageToGitHub(file) {
+            const repoOwner = 'radheeshm'; // Replace with your GitHub username
+            const repoName = 'stockimages'; // Replace with your repository name
+            const filePath = `images/${file.name}`; // Save images in an "images" folder
+            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+
+            const token = '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'; // Replace with your token
+
+            const fileContent = await readFileAsBase64(file);
+
+            const response = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: `Upload ${file.name}`,
+                    content: fileContent,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`GitHub API error: ${response.statusText}`);
+            }
+
+            return response.json();
         }
 
-    </script>  <!-- Moved here -->
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64Content = reader.result.split(',')[1];
+                    resolve(base64Content);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
 </body>
 </html>
