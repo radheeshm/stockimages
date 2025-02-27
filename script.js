@@ -15,10 +15,11 @@ async function uploadImage() {
     
     reader.onload = async function () {
         const content = reader.result.split(",")[1]; // Remove data URI prefix
-
         const path = `uploads/${file.name}`;
         const url = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/${path}`;
         
+        console.log("Uploading to:", url); // Debug log
+
         const response = await fetch(url, {
             method: "PUT",
             headers: {
@@ -32,13 +33,15 @@ async function uploadImage() {
             })
         });
 
+        const result = await response.json();
+        console.log("Response:", result); // Debug log
+
         if (response.ok) {
             document.getElementById("status").innerText = "✅ Image uploaded successfully!";
         } else {
-            document.getElementById("status").innerText = "❌ Upload failed!";
+            document.getElementById("status").innerText = `❌ Upload failed: ${result.message}`;
         }
     };
     
     reader.readAsDataURL(file);
 }
-
