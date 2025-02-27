@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+        }
+        .gallery img {
+            width: 200px;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    <script>
+        async function uploadImage() {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            
+            fileInput.onchange = async () => {
+                const file = fileInput.files[0];
+                if (!file) return;
+                
+                const formData = new FormData();
+                formData.append("file", file);
+                
+                try {
+                    const response = await fetch("http://localhost:5000/upload", {
+                        method: "POST",
+                        body: formData,
+                    });
+                    
+                    const result = await response.json();
+                    alert(result.message);
+                } catch (error) {
+                    alert("Error uploading image.");
+                }
+            };
+            
+            fileInput.click();
+        }
+    </script>
+</head>
+<body>
+    <h1>My Image Gallery</h1>
+    <button onclick="uploadImage()">Upload Image</button>
+    <div class="gallery">
+        <img src="images/image1.jpg" alt="Image 1">
+        <img src="images/image2.jpg" alt="Image 2">
+        <img src="images/image3.jpg" alt="Image 3">
+    </div>
+</body>
+</html>
