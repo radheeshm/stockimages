@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Image to GitHub</title>
+    <title>Upload Image to GitHub1</title>
     <script defer src="script.js"></script>
 </head>
 <body>
@@ -14,52 +14,54 @@
 
     <script>
         const GITHUB_USERNAME = "radheeshm";
-const REPO_NAME = "stockimages";
-const BRANCH = "main"; // or "master" if default
-const ACCESS_TOKEN = "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";
-
-async function uploadImage() {
-    const fileInput = document.getElementById("fileInput");
-    if (!fileInput.files.length) {
-        alert("Please select a file first!");
-        return;
-    }
-
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    
-    reader.onload = async function () {
-        const content = reader.result.split(",")[1]; // Remove data URI prefix
-        const path = `uploads/${file.name}`;
-        const url = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/${path}`;
+        const REPO_NAME = "stockimages";
+        const BRANCH = "main"; // or "master" if default
+        const ACCESS_TOKEN = "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";
         
-        console.log("Uploading to:", url); // Debug log
-
-        const response = await fetch(url, {
-            method: "PUT",
-            headers: {
-                "Authorization": `token ${ACCESS_TOKEN}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                message: `Upload ${file.name}`,
-                content: content,
-                branch: BRANCH
-            })
-        });
-
-        const result = await response.json();
-        console.log("Response:", result); // Debug log
-
-        if (response.ok) {
-            document.getElementById("status").innerText = "✅ Image uploaded successfully!";
-        } else {
-            document.getElementById("status").innerText = `❌ Upload failed: ${result.message}`;
+        async function uploadImage() {
+            const fileInput = document.getElementById("fileInput");
+            if (!fileInput.files.length) {
+                alert("Please select a file first!");
+                return;
+            }
+        
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = async function () {
+                const content = reader.result.split(",")[1]; // Extract base64 content
+                const path = `uploads/${file.name}`; // File path in repo
+                const url = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/${path}`;
+        
+                // Use Basic Authentication (Alternative Method)
+                const headers = {
+                    "Authorization": `Basic ${btoa(GITHUB_USERNAME + ":" + ACCESS_TOKEN)}`,
+                    "Content-Type": "application/json"
+                };
+        
+                const response = await fetch(url, {
+                    method: "PUT",
+                    headers: headers,
+                    body: JSON.stringify({
+                        message: `Upload ${file.name}`,
+                        content: content,
+                        branch: BRANCH
+                    })
+                });
+        
+                const result = await response.json();
+                console.log("GitHub Response:", result); // Debugging
+        
+                if (response.ok) {
+                    document.getElementById("status").innerText = "✅ Image uploaded successfully!";
+                } else {
+                    document.getElementById("status").innerText = `❌ Upload failed: ${result.message}`;
+                }
+            };
+            
+            reader.readAsDataURL(file);
         }
-    };
-    
-    reader.readAsDataURL(file);
-}
+
     </script>  <!-- Moved here -->
 </body>
 </html>
