@@ -26,33 +26,51 @@
     </style>
     <script>
         async function uploadImage() {
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.accept = 'image/*';
-            
-            fileInput.onchange = async () => {
-                const file = fileInput.files[0];
-                if (!file) return;
-                
-                const formData = new FormData();
-                formData.append("file", file);
-                
-                try {
-                    const response = await fetch("http://localhost:5000/upload", {
-                        method: "POST",
-                        body: formData,
-                    });
-                    
-                    const result = await response.json();
-                    alert(result.message);
-                } catch (error) {
-                    alert("Error uploading image.");
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+
+    fileInput.onchange = async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+            const base64 = reader.result.split(',')[1]; // Convert to Base64
+
+            const GITHUB_USERNAME = "radheeshm";  // Replace with your GitHub username
+            const REPO_NAME = "stockimages";           // Replace with your repository name
+            const FILE_PATH = `images/${file.name}`; // Path in your repo
+            const TOKEN = "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";       // Replace with your GitHub PAT
+
+            const response = await fetch(
+                `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/${FILE_PATH}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `token ${TOKEN}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: `Uploaded ${file.name}`,
+                        content: base64
+                    })
                 }
-            };
-            
-            fileInput.click();
-        }
-    </script>
+            );
+
+            if (response.ok) {
+                alert("Image uploaded successfully!");
+            } else {
+                alert("Failed to upload image.");
+            }
+        };
+    };
+
+    fileInput.click();
+}
+
+   </script>
 </head>
 <body>
     <h1>My Image Gallery</h1>
