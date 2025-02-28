@@ -37,33 +37,39 @@
         });
 
         async function uploadImageToGitHub(file) {
-            const repoOwner = 'radheeshm'; // Replace with your GitHub username
-            const repoName = 'stockimages'; // Replace with your repository name
-            const filePath = `images/${file.name}`; // Save images in an "images" folder
-            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+    const repoOwner = 'radheeshm';
+    const repoName = 'stockimages';
+    const filePath = `images/${file.name}`;
+    const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
 
-            const token = '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'; // Replace with your token
+    const token = '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';
 
-            const fileContent = await readFileAsBase64(file);
+    console.log('Uploading file:', file.name);
+    console.log('API URL:', apiUrl);
 
-            const response = await fetch(apiUrl, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: `Upload ${file.name}`,
-                    content: fileContent,
-                }),
-            });
+    const fileContent = await readFileAsBase64(file);
 
-            if (!response.ok) {
-                throw new Error(`GitHub API error: ${response.statusText}`);
-            }
+    const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `token ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            message: `Upload ${file.name}`,
+            content: fileContent,
+        }),
+    });
 
-            return response.json();
-        }
+    console.log('Response status:', response.status);
+    console.log('Response data:', await response.json());
+
+    if (!response.ok) {
+        throw new Error(`GitHub API error: ${response.statusText}`);
+    }
+
+    return response.json();
+}
 
         function readFileAsBase64(file) {
             return new Promise((resolve, reject) => {
