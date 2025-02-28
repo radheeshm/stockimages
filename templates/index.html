@@ -3,7 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Image to GitHub</title>
+    <title>Upload and Display Images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .image-container img {
+            width: 200px;
+            height: auto;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
     <h2>Upload an Image</h2>
@@ -11,5 +30,12 @@
         <input type="file" name="file" required>
         <button type="submit">Upload</button>
     </form>
+
+    <h2>Uploaded Images</h2>
+    <div class="image-container">
+        {% for image in images %}
+            <img src="{{ image }}" alt="Uploaded Image">
+        {% endfor %}
+    </div>
 </body>
 </html>
