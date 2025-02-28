@@ -9,7 +9,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Upload folder
-UPLOAD_FOLDER = "static/uploads"
+UPLOAD_FOLDER = "static/images"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
