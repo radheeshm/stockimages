@@ -25,16 +25,16 @@
     </style>
 </head>
 <body>
-    <h2>Upload an Image</h2>
-    <form action="/" method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" required>
+    <h1>Upload Image</h1>
+    <form action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
         <button type="submit">Upload</button>
     </form>
 
     <h2>Uploaded Images</h2>
-    <div class="image-container">
+    <div>
         {% for image in images %}
-            <img src="{{ image }}" alt="Uploaded Image">
+            <img src="{{ image }}" alt="Uploaded Image" width="300">
         {% endfor %}
     </div>
 </body>
