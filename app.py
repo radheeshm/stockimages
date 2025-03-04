@@ -35,7 +35,7 @@ def upload_file():
             # Upload image to GitHub
             with open(filepath, "rb") as f:
                 content = f.read()
-                repo.create_file(f"uploads/{file.filename}", f"Add {file.filename}", content, branch="main")
+                repo.create_file(f"images/{file.filename}", f"Add {file.filename}", content, branch="main")
             
             return redirect(url_for("upload_file"))
 
